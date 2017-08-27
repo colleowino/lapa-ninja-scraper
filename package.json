@@ -13,6 +13,8 @@
   "author": "colleowino",
   "license": "ISC",
   "dependencies": {
+    "image-downloader": "^3.2.2",
+    "mkdirp": "^0.5.1",
     "scrape-it": "^3.3.2"
   }
 }

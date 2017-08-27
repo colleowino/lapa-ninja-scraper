@@ -1,9 +1,13 @@
 const scrapeIt = require("scrape-it");
-var url = "https://www.lapa.ninja/"
+const download = require('image-downloader');
+const mkdirp = require('mkdirp');
+const path = require('path');
+
+var url = "https://www.lapa.ninja"
 
 // Promise interface
 function scrapeListPage(pgNum){
-	scrapeIt(url+"page/"+pgNum, {
+	scrapeIt(url+"/page/"+pgNum, {
 			// fetch the screenshot pages
 			pagelinks: {
 				listItem: ".lapa-post__item",
@@ -30,10 +34,28 @@ function scrapePostPage(link){
 		}
 	}).then( res => {
 		console.log(url+res.imageLink);
-		//console.log(res);
 	});
 }
 
+var img_test = "https://www.lapa.ninja/assets/images/Frederique-Matti.jpg" 
 
-scrapePostPage(linkpage);
+function downloadImage(pgNum,imglink){
+	var folder = path.join(__dirname,"downloads", pgNum.toString());
+
+	mkdirp(folder,function(err){
+		if(err) console.error(err)
+		else console.log("folder created: "+pgNum);
+	});
+
+	download.image({url: imglink, dest: folder})
+		.then(({ filename, image }) => {
+			console.log('File saved to', filename)
+		}).catch((err) => {
+			throw err
+		})
+
+}
+
+//downloadImage(2, img_test);
+//scrapePostPage(linkpage);
 //scrapeListPage(2);
