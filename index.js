@@ -8,7 +8,7 @@ var pgNum = process.argv[2];
 
 // Promise interface
 function scrapeListPage(pgNum){
-	console.log("Downloading page: "+pgNum);
+	//console.log("Downloading page: "+pgNum);
 
 	scrapeIt(url+"/page/"+pgNum, {
 			// fetch the screenshot pages
@@ -55,7 +55,7 @@ function downloadImage(imglink){
 
 	download.image({url: imglink, dest: folder})
 		.then(({ filename, image }) => {
-			console.log('completed ', path.basename(filename))
+			//console.log('completed ', path.basename(filename))
 		}).catch((err) => {
 			throw err
 		})
