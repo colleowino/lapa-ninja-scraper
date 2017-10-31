@@ -10,7 +10,12 @@ var pgNum = process.argv[2];
 function scrapeListPage(pgNum){
 	//console.log("Downloading page: "+pgNum);
 
-	scrapeIt(url+"/page/"+pgNum, {
+	// first page loads when page num excluded
+	if(pgNum > 1){
+			url += /page/+pgNum;
+	}
+
+	scrapeIt(url, {
 			// fetch the screenshot pages
 			pagelinks: {
 				listItem: ".lapa-post__item",
@@ -28,6 +33,7 @@ function scrapeListPage(pgNum){
 			scrapePostPage(found[i].post);
 		}
 	});
+
 }
 
 
