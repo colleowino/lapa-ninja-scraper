@@ -12,7 +12,6 @@ function downloadImage(imglink) {
 
 	mkdirp(folder, (err) => {
 		if (err) console.error(err);
-		// else console.log('folder created: '+pgNum);
 	});
 
 	download.image({ url: imglink, dest: folder })
