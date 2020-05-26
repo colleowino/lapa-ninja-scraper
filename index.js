@@ -1,74 +1,33 @@
-const scrapeIt = require('scrape-it');
-const download = require('image-downloader');
-const mkdirp = require('mkdirp');
-const path = require('path');
+const cli = require('./utils/cli');
+const welcome = require('cli-welcome');
 
-let url = 'https://www.lapa.ninja';
-const pgNum = process.argv[2];
+const getList = require('./utils/getListPage');
+const getScreenshot = require('./utils/getScreenshot');
+const getImage = require('./utils/getImage');
 
+const [input] = cli.input;
 
-function downloadImage(imglink) {
-	const folder = path.join(__dirname, 'downloads', pgNum.toString());
+(async () => {
+  welcome(`Lapa.ninja Scraper`, `by Colleowino`, {
+    bgColor: `#007C91`,
+    color: `#FFFFFF`,
+    bold: true,
+    clear: true
+  });
 
-	mkdirp(folder, (err) => {
-		if (err) console.error(err);
-	});
+  input === 'help' && (await cli.showHelp(0));
+  const page = cli.flags.page;
 
-	download.image({ url: imglink, dest: folder })
-		.then(() => {
-			// console.log('completed ', path.basename(filename))
-		}).catch((err) => {
-			throw err;
-		});
-}
+  const results = await getList(page);
 
-function scrapePostPage(link) {
-// console.log('fetching: '+link);
+  const imgLinks = [];
+  for (el of results.pagelinks) {
+    title = el.title.replace(' Landing Page Design', '');
+    let img = await getScreenshot(el.link, title);
+    imgLinks.push({ img, title });
+  }
 
-	scrapeIt(link, {
-		imageLink: {
-			selector: '.detail-post__img img',
-			attr: 'src',
-		},
-	}).then((res) => {
-		const img = url + res.data.imageLink;
-		downloadImage(img);
-	});
-}
-
-function scrapeListPage() {
-	console.log(`Downloading page: ${pgNum}`);
-
-	// first page loads when page num excluded
-	if (pgNum > 1) {
-		url += /page/ + pgNum;
-	}
-
-	scrapeIt(url, {
-		// fetch the screenshot pages
-		pagelinks: {
-			listItem: '.lapa-post__item',
-			data: {
-				creator: 'a.lapa-post__name-link',
-				post: {
-					selector: 'a.lapa-post__name-link',
-					attr: 'href',
-				},
-			},
-		},
-	}).then((res) => {
-		const found = res.data.pagelinks;
-		// console.log(`found ${found[0].post}`);
-		for (let i = 0; i < found.length; i++) {
-			scrapePostPage(found[i].post);
-		}
-	}).catch((err) => {
-		throw err;
-	});
-}
-
-// var img_test = 'https://www.lapa.ninja/assets/images/Frederique-Matti.jpg'
-// downloadImage(2, img_test);
-// var linkpage = 'https://www.lapa.ninja/post/frederique-matti/'
-// scrapePostPage(linkpage);
-scrapeListPage(pgNum);
+  for (el of imgLinks) {
+    await getImage(page, el.img, el.title);
+  }
+})();
